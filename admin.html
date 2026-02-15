@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillHub - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        select, input[type="file"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .course-preview {
+            background-color: #f5f7fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .course-preview.active {
+            display: block;
+        }
+
+        .course-preview h3 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-preview p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn {
+            background-color: #1e3c72;
+            color: white;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .upload-btn:hover {
+            background-color: #2a5298;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+
+        .upload-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+            flex: 0;
+            min-width: 100px;
+            display: none;
+        }
+
+        .delete-btn.active {
+            display: block;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Courses list */
+        .courses-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .courses-section h2 {
+            color: #1e3c72;
+            margin-bottom: 1.5rem;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-item {
+            background: #f5f7fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .course-item.has-video {
+            border-left-color: #28a745;
+        }
+
+        .course-item h4 {
+            color: #1e3c72;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .course-item p {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-status {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-status.uploaded {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .video-status.not-uploaded {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .course-item button {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .upload-section {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .upload-btn, .delete-btn {
+                width: 100%;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 SkillHub Admin Dashboard</h1>
+            <p>Upload and manage course videos directly to your database</p>
+        </div>
+
+        <div class="upload-section">
+            <h2>Upload Course Video</h2>
+
+            <div id="message" class="message"></div>
+
+            <div class="form-group">
+                <label for="courseSelect">Select Course</label>
+                <select id="courseSelect">
+                    <option value="">-- Choose a course --</option>
+                </select>
+            </div>
+
+            <div id="coursePreview" class="course-preview">
+                <h3 id="previewTitle"></h3>
+                <p><strong>Category:</strong> <span id="previewCategory"></span></p>
+                <p><strong>Level:</strong> <span id="previewLevel"></span></p>
+                <p><strong>Price:</strong> $<span id="previewPrice"></span></p>
+                <p id="videoStatusInfo"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="videoFile">Select Video File</label>
+                <input type="file" id="videoFile" accept="video/*">
+                <small>Supported formats: MP4, WebM, OGG (Max 500MB)</small>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="upload-btn" id="uploadBtn" disabled>Upload Video</button>
+                <button class="delete-btn" id="deleteBtn">Delete Video</button>
+            </div>
+        </div>
+
+        <div class="courses-section">
+            <h2>All Courses</h2>
+            <div class="courses-grid" id="coursesGrid">
+                <!-- Courses will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let courses = [];
+        let selectedCourseId = null;
+        let currentUser = null;
+        let currentToken = null;
+
+        // Check authentication on page load
+        window.addEventListener('load', function() {
+            checkAdminAccess();
+        });
+
+        // Check if user has admin access
+        function checkAdminAccess() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                alert('Access Denied: Please login as admin');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(user);
+            currentToken = token;
+
+            if (currentUser.role !== 'admin') {
+                alert('Access Denied: Admin role required');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Add logout button
+            addLogoutButton();
+            loadCourses();
+        }
+
+        // Add logout button to page
+        function addLogoutButton() {
+            const header = document.querySelector('.header');
+            const logoutBtn = document.createElement('button');
+            logoutBtn.textContent = 'Logout';
+            logoutBtn.style.cssText = 'position: absolute; top: 2rem; right: 2rem; padding: 0.5rem 1rem; background-color: #ff6b6b; color: white; border: none; border-radius: 5px; cursor: pointer;';
+            logoutBtn.onclick = logout;
+            header.style.position = 'relative';
+            header.appendChild(logoutBtn);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Load courses on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Courses will be loaded after authentication check
+        });
+
+        // Load courses from API
+        async function loadCourses() {
+            try {
+                const response = await fetch(`${API_URL}/courses`);
+                courses = await response.json();
+                populateSelect();
+                displayCourses();
+            } catch (error) {
+                showMessage('Error loading courses: ' + error.message, 'error');
+            }
+        }
+                courses = await response.json();
+                populateSelect();
+                displayCourses();
+            } catch (error) {
+                showMessage('Error loading courses: ' + error.message, 'error');
+            }
+        }
+
+        // Populate course select dropdown
+        function populateSelect() {
+            const select = document.getElementById('courseSelect');
+            const defaultOption = `<option value="">-- Choose a course --</option>`;
+            const options = courses.map(course => 
+                `<option value="${course.id}">${course.icon} ${course.title}</option>`
+            ).join('');
+            select.innerHTML = defaultOption + options;
+        }
+
+        // Display all courses in grid
+        function displayCourses() {
+            const grid = document.getElementById('coursesGrid');
+            grid.innerHTML = courses.map(course => `
+                <div class="course-item ${course.videoUrl ? 'has-video' : ''}">
+                    <h4>${course.icon} ${course.title}</h4>
+                    <p>${course.category.replace('-', ' ').toUpperCase()}</p>
+                    <p>Level: ${course.level}</p>
+                    <span class="video-status ${course.videoUrl ? 'uploaded' : 'not-uploaded'}">
+                        ${course.videoUrl ? '✓ Video Uploaded' : '✗ No Video'}
+                    </span>
+                    ${course.videoUploadedAt ? `<p style="color: #999; font-size: 0.75rem;">Uploaded: ${new Date(course.videoUploadedAt).toLocaleDateString()}</p>` : ''}
+                    <button onclick="selectCourse(${course.id})">Select</button>
+                </div>
+            `).join('');
+        }
+
+        // Select course from dropdown
+        document.getElementById('courseSelect').addEventListener('change', function(e) {
+            if (e.target.value) {
+                selectCourse(parseInt(e.target.value));
+            } else {
+                selectedCourseId = null;
+                document.getElementById('coursePreview').classList.remove('active');
+                document.getElementById('uploadBtn').disabled = true;
+                document.getElementById('deleteBtn').classList.remove('active');
+                document.getElementById('videoFile').value = '';
+            }
+        });
+
+        // Select course
+        function selectCourse(id) {
+            selectedCourseId = id;
+            const course = courses.find(c => c.id === id);
+            
+            document.getElementById('courseSelect').value = id;
+            document.getElementById('previewTitle').textContent = course.title;
+            document.getElementById('previewCategory').textContent = course.category.replace('-', ' ');
+            document.getElementById('previewLevel').textContent = course.level;
+            document.getElementById('previewPrice').textContent = course.price.toFixed(2);
+            
+            const statusInfo = document.getElementById('videoStatusInfo');
+            if (course.videoUrl) {
+                statusInfo.innerHTML = `<strong style="color: #28a745;">✓ Video already uploaded</strong>`;
+                document.getElementById('deleteBtn').classList.add('active');
+            } else {
+                statusInfo.innerHTML = `<strong style="color: #ff6b6b;">✗ No video uploaded yet</strong>`;
+                document.getElementById('deleteBtn').classList.remove('active');
+            }
+            
+            document.getElementById('coursePreview').classList.add('active');
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('videoFile').value = '';
+        }
+
+        // Handle file selection
+        document.getElementById('videoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                showMessage(`File selected: ${file.name} (${sizeMB}MB)`, 'info');
+            }
+        });
+
+        // Upload video
+        document.getElementById('uploadBtn').addEventListener('click', uploadVideo);
+
+        async function uploadVideo() {
+            if (!selectedCourseId) {
+                showMessage('Please select a course', 'error');
+                return;
+            }
+
+            const fileInput = document.getElementById('videoFile');
+            if (!fileInput.files.length) {
+                showMessage('Please select a video file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+
+            const progressBar = document.getElementById('progressBar');
+            progressBar.classList.add('active');
+
+            try {
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        document.getElementById('progressFill').style.width = percentComplete + '%';
+                    }
+                });
+
+                xhr.addEventListener('load', function() {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        showMessage('Video uploaded successfully!', 'success');
+                        fileInput.value = '';
+                        loadCourses();
+                    } else {
+                        const response = JSON.parse(xhr.responseText);
+                        showMessage('Upload failed: ' + (response.error || 'Unknown error'), 'error');
+                    }
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Upload Video';
+                    progressBar.classList.remove('active');
+                    document.getElementById('progressFill').style.width = '0%';
+                });
+
+                xhr.addEventListener('error', function() {
+                    showMessage('Network error during upload', 'error');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Upload Video';
+                    progressBar.classList.remove('active');
+                    document.getElementById('progressFill').style.width = '0%';
+                });
+
+                xhr.open('POST', `${API_URL}/courses/${selectedCourseId}/upload-video`);
+                xhr.setRequestHeader('Authorization', `Bearer ${currentToken}`);
+                xhr.send(formData);
+
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Video';
+                progressBar.classList.remove('active');
+            }
+        }
+
+        // Delete video
+        document.getElementById('deleteBtn').addEventListener('click', async function() {
+            if (!selectedCourseId) return;
+
+            if (!confirm('Are you sure you want to delete this video?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/courses/${selectedCourseId}/video`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('Video deleted successfully!', 'success');
+                    loadCourses();
+                } else {
+                    const error = await response.json();
+                    showMessage('Error deleting video: ' + error.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Show message
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message show ${type}`;
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
